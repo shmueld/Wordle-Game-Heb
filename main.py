@@ -1,5 +1,6 @@
 import tkinter as tk
 from PIL import Image, ImageTk
+# from Pillow import Image, ImageT#
 import ctypes
 import words_api
 import settings as st
@@ -52,7 +53,8 @@ class Wordle:
         top_frame = tk.Frame(self.root, bg=self.BG)
         top_frame.pack(fill="x")
 
-        sett = tk.Button(top_frame, image=self.setting,command=self.open_setting, bd=0, bg=self.BG, cursor="hand2", activebackground=self.BG)
+        sett = tk.Button(top_frame, image=self.setting, command=self.open_setting, bd=0, bg=self.BG, cursor="hand2",
+                         activebackground=self.BG)
         sett.pack(side="right")
         sett.bind("<Enter>", self.on_hover)
         sett.bind("<Leave>", self.off_hover)
@@ -86,7 +88,7 @@ class Wordle:
         keyboard_frame = tk.Frame(self.root, bg=self.BG)
         keyboard_frame.pack(pady=5)
 
-        c = 65
+        c = 1488
 
         f1 = tk.Frame(keyboard_frame, bg=self.BG)
         f1.pack(side="top", pady=2)
@@ -99,15 +101,22 @@ class Wordle:
         step = 6
         self.keypad_buttons = [[], [], []]
 
-        self.keypad_btn_pos = {0: [chr(i) for i in range(65, 71)],
-                               1: [chr(i) for i in range(71, 81)],
-                               2: [chr(i) for i in range(81, 91)]}
+        # self.keypad_btn_pos = {0: [chr(i) for i in range(65, 71)],
+        #                        1: [chr(i) for i in range(71, 81)],
+        #                        2: [chr(i) for i in range(81, 91)]}
+
+        self.keypad_btn_pos = {0: [chr(i) for i in range(1488, 1495)],
+                               1: [chr(i) for i in range(1495, 1505)],
+                               2: [chr(i) for i in range(1505, 1516)]}
 
         key_pad_color = "#ff7700"
         index = 0
         for i in range(3):
             for _ in range(step):
-                b = tk.Button(f[index], text=chr(c), font="cambria 13 bold", bg=self.BG,
+                # if c==1498 or c==1501 or c==1503 or c==1507 or c==1509:
+                #    c+=1
+
+                b = tk.Button(f[index], text=chr(c), font="Arial 13 bold", bg=self.BG,
                               fg=key_pad_color, cursor="hand2", padx=3)
                 b.pack(side="left", padx=2)
                 self.keypad_buttons[i].append(b)
@@ -115,25 +124,29 @@ class Wordle:
                 b.bind("<Enter>", lambda e: on_hover(e, "#575656"))
                 b.bind("<Leave>", lambda e: off_hover(e, self.BG))
                 c += 1
+
+                if i == 2 and c >= 1515:
+                    break
+
             if i == 0:
-                b = tk.Button(f[index], text="Enter", font="cambria 13 bold", bg=self.BG,
+                b = tk.Button(f[index], text="Enter", font="Arial 13 bold", bg=self.BG,
                               fg=key_pad_color, cursor="hand2")
                 b.pack(side="left", padx=2)
                 b.bind("<Button-1>", lambda e: self.key_press(keyboard=e))
                 b.bind("<Enter>", lambda e: on_hover(e, "#575656"))
                 b.bind("<Leave>", lambda e: off_hover(e, self.BG))
             if i == 0:
-                b = tk.Button(f[index], text="←", font="cambria 13 bold", bg=self.BG,
+                b = tk.Button(f[index], text="←", font="Arial 13 bold", bg=self.BG,
                               fg=key_pad_color, cursor="hand2")
                 b.pack(side="left", padx=2)
                 b.bind("<Button-1>", lambda e: self.key_press(keyboard=e))
                 b.bind("<Enter>", lambda e: on_hover(e, "#575656"))
                 b.bind("<Leave>", lambda e: off_hover(e, self.BG))
             index += 1
-            step = 10
+            step = 11
 
-        self.status_bar = tk.Label(self.root, text=f"Score : {self.score}",font="cambria 10 bold",
-                                   anchor="w",padx=10,background="#242424",fg="white")
+        self.status_bar = tk.Label(self.root, text=f"Score : {self.score}", font="Arial 10 bold",
+                                   anchor="w", padx=10, background="#242424", fg="white")
         self.status_bar.pack(fill='x', side="bottom")
 
         self.root.bind("<KeyRelease>", self.key_press)
@@ -161,7 +174,8 @@ class Wordle:
                               font="lucida 18", bg=self.BG, width=3, height=1)
                 b.pack(side="left", padx=2)
 
-                row_btn.append(b)
+                row_btn.insert(0, b)
+
             self.buttons.append(row_btn)
 
     def key_press(self, e=None, keyboard=None):
@@ -172,7 +186,7 @@ class Wordle:
             elif e.keysym == "Return":
                 self.check_for_match()
 
-            elif 65 <= e.keycode <= 90:
+            elif 1488 <= e.keysym_num <= 1516:
                 key = e.char
                 if self.current_b == self.word_size:
                     self.current_b = self.word_size - 1
@@ -181,9 +195,9 @@ class Wordle:
                     characters[self.current_b] = ""
                     self.guess = "".join(characters)
 
-                self.buttons[self.current_B_row][self.current_b]["text"] = key.upper()
+                self.buttons[self.current_B_row][self.current_b]["text"] = chr(e.keysym_num)  # .upper()
                 self.buttons[self.current_B_row][self.current_b]['bg'] = "#3d3d3d"
-                self.guess += key.upper()
+                self.guess += chr(e.keysym_num)  # key.upper()
                 self.current_b += 1
             else:
                 print(e.keysym)
@@ -227,17 +241,17 @@ class Wordle:
                 self.won = True
                 self.score += self.MAX_SCORE - 2 * (self.guess_count - 1)
 
-                self.status_bar["text"] = f"Score : {self.score}"
+                self.status_bar["text"] = f"מספר נקודות : {self.score}"
 
                 if self.score > self.high_score:
                     self.update_high_score()
 
-                print("You won !!!")
+                print("נצחת !!!")
                 self.word_api.select_word()
                 self.show_popup()
             else:
                 if self.guess_count == 6:
-                    print("You Lost !!!")
+                    print("הפסדת !!!")
                     self.show_popup()
                     self.word_api.select_word()
                     return
@@ -316,7 +330,7 @@ class Wordle:
 
     def show_popup(self):
         popup = tk.Toplevel()
-        popup.title("Game Over")
+        popup.title("המשחק הסתיים")
 
         x_co = int(self.width / 2 - (450 / 2)) + self.x_co
         y_co = self.y_co + int(self.height / 2 - (250 / 2))
@@ -326,23 +340,24 @@ class Wordle:
         popup.wm_iconbitmap('images/icon.ico')
         popup.focus_force()
 
-        status = "You Lost :("
+        status = "הפסדת :("
 
         if self.won:
-            status = "You Won !!!"
+            status = "ניצחת !!!"
 
-        status_label = tk.Label(popup, text=status, font="cambria 20 bold", fg="#14f41f", bg="black")
+        status_label = tk.Label(popup, text=status, font="Arial 20 bold", fg="#14f41f", bg="black")
         status_label.pack(pady=10)
 
         if not self.won:
-            right_word = tk.Label(popup, text=f"The word was {self.word_api.word}", font="cambria 15 bold",
+            right_word = tk.Label(popup, text=f"המילה שנבחרה היא:  {self.word_api.word}", font="Arial 15 bold",
                                   fg="#14f41f", bg="black")
             right_word.pack(pady=3)
 
-        score_label = tk.Label(popup, text=f"Score : {self.score}", font="lucida 15 bold", fg="white", bg="black")
+        score_label = tk.Label(popup, text=f"הניקוד שלך : {self.score}", font="lucida 15 bold", fg="white", bg="black")
         score_label.pack(pady=4)
 
-        high_score_label = tk.Label(popup, text=f"High Score : {self.high_score}", font="lucida 15 bold", fg="white", bg="black")
+        high_score_label = tk.Label(popup, text=f"השיא : {self.high_score}", font="lucida 15 bold", fg="white",
+                                    bg="black")
         high_score_label.pack(pady=4)
 
         button = tk.Button(popup, text="Okay", font="lucida 12 bold", fg="#00d0ff", cursor="hand2",
@@ -359,20 +374,14 @@ class Wordle:
 
     def change_keypad_color(self, color, guess, on_hover_color=None, off_hover_color=None):
         for char in guess:
-            if 65 <= ord(char) <= 70:
-                btn_frame_index = 0
-                btn_index = ord(char) - 65
-            elif 71 <= ord(char) <= 80:
-                btn_frame_index = 1
-                btn_index = ord(char) - 71
-            else:
-                btn_frame_index = 2
-                btn_index = ord(char) - 81
-            self.keypad_buttons[btn_frame_index][btn_index]['bg'] = color
+            for buttons_list in self.keypad_buttons:
+                for button in buttons_list:
+                    if button["text"] == guess:
+                        button['bg'] = color
 
-            if on_hover_color:
-                self.keypad_buttons[btn_frame_index][btn_index].bind("<Enter>", lambda e: on_hover(e, on_hover_color))
-                self.keypad_buttons[btn_frame_index][btn_index].bind("<Leave>", lambda e: off_hover(e, off_hover_color))
+                    if on_hover_color:
+                        button.bind("<Enter>", lambda e: on_hover(e, on_hover_color))
+                        button.bind("<Leave>", lambda e: off_hover(e, off_hover_color))
 
     def get_from_db(self):
         if not os.path.exists("settings.db"):
@@ -407,7 +416,7 @@ class Wordle:
         cursor = connection.cursor()
 
         self.high_score = self.score
-        print("update score = ",self.high_score)
+        print("update score = ", self.high_score)
         cursor.execute(f"UPDATE info SET high_score={self.score} WHERE id=0")
         connection.commit()
 
